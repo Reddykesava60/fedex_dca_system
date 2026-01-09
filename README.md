@@ -366,29 +366,6 @@ streamlit run app.py --logger.level=debug
 - Add pagination for large datasets
 - Implement lazy loading for visualizations
 
----
-
-## 🤝 Contributing
-
-We welcome contributions to improve the FedEx DCA Management System!
-
-### How to Contribute
-
-1. **Fork the Repository**
-2. **Create a Feature Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make Your Changes**
-4. **Commit Your Changes**
-   ```bash
-   git commit -m "Add: Brief description of your changes"
-   ```
-5. **Push to Your Fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-6. **Submit a Pull Request**
 
 ### Coding Standards
 
