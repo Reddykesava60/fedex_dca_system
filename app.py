@@ -118,56 +118,60 @@ def render_dashboard():
 
 def render_upload():
     st.title("📂 Upload & Process Cases")
-    
-    uploaded_file = st.file_uploader("Upload CSV file", type=['csv'])
-    
-    if uploaded_file:
+
+    st.info("You can either upload your own CSV file or auto-generate a sample dataset.")
+
+    # ---------- UPLOAD CSV ----------
+    uploaded_file = st.file_uploader(
+        "Upload CSV file",
+        type=["csv"],
+        help="Upload a CSV file with debt case data"
+    )
+
+    if uploaded_file is not None:
         try:
             df = pd.read_csv(uploaded_file)
-            st.success(f"Uploaded {len(df)} rows.")
-            
-            if st.button("Process with AI"):
+            st.success(f"✅ Uploaded {len(df)} rows.")
+            st.dataframe(df.head())
+
+            if st.button("⚙️ Process with AI"):
                 with st.spinner("Analyzing cases..."):
-                    # 1. Predict
                     processed_df = st.session_state.ml_engine.predict_cases(df)
-                    
-                    # 2. Assign DCA
-                    processed_df['dca_assigned'] = processed_df.apply(DCAAssigner.assign_case, axis=1)
-                    
-                    # Save to session
+                    processed_df['dca_assigned'] = processed_df.apply(
+                        DCAAssigner.assign_case, axis=1
+                    )
+
                     st.session_state.cases_df = processed_df
-                    st.success("Analysis Complete! Cases assigned.")
-                    
-                    # Preview
+                    st.success("🎯 Analysis complete!")
                     st.dataframe(processed_df.head())
+
         except Exception as e:
-            st.error(f"Error processing file: {e}")
-            
-    # Template Download
-    st.markdown("---")
-    st.info("Don't have a file? Use the synthetic data generator (`generate_data.py`) to create `training_data.csv` and upload it here.")
+            st.error(f"❌ Error processing CSV: {e}")
 
-def render_cases():
-    st.title("📋 Active Case Management")
-    df = st.session_state.cases_df
-    
-    if df.empty:
-        st.warning("No data found.")
-        return
+    st.divider()
 
-    # Filters
-    col1, col2 = st.columns(2)
-    with col1:
-        priority_filter = st.multiselect("Filter by Priority", options=['High', 'Medium', 'Low'], default=['High', 'Medium', 'Low'])
-    with col2:
-        dca_filter = st.multiselect("Filter by DCA", options=df['dca_assigned'].unique(), default=df['dca_assigned'].unique())
+    # ---------- AUTO GENERATE ----------
+    st.subheader("🔄 Auto Generate Sample Dataset")
 
-    filtered_df = df[
-        (df['recovery_likelihood'].isin(priority_filter)) &
-        (df['dca_assigned'].isin(dca_filter))
-    ]
-    
-    st.dataframe(filtered_df, use_container_width=True)
+    if st.button("Generate Synthetic Dataset"):
+        try:
+            df = generate_synthetic_data(1000)
+
+            st.session_state.cases_df = df
+            st.success("✅ Synthetic dataset generated!")
+            st.dataframe(df.head())
+
+            csv = df.to_csv(index=False).encode("utf-8")
+
+            st.download_button(
+                label="⬇️ Download Dataset (CSV)",
+                data=csv,
+                file_name="training_data.csv",
+                mime="text/csv"
+            )
+
+        except Exception as e:
+            st.error(f"❌ Error generating dataset: {e}")
 
 def render_insights():
     st.title("🤖 AI Insights & Recommendations")
