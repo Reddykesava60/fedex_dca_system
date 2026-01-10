@@ -12,33 +12,8 @@ from generate_data import generate_synthetic_data
 st.set_page_config(page_title="FedEx DCA System", page_icon="📦", layout="wide")
 
 
-st.subheader("🔄 Auto Generate Sample Dataset")
 
-if st.button("Generate Synthetic Dataset"):
-    try:
-        df = generate_synthetic_data(1000)
 
-        # Save on server (optional, for internal use)
-        df.to_csv("training_data.csv", index=False)
-
-        # Store in session
-        st.session_state["uploaded_data"] = df
-
-        st.success("✅ Synthetic dataset generated successfully!")
-        st.dataframe(df.head(10))
-
-        # 🔽 DOWNLOAD BUTTON (THIS IS THE SAVE OPTION)
-        csv = df.to_csv(index=False).encode("utf-8")
-
-        st.download_button(
-            label="⬇️ Download Dataset (CSV)",
-            data=csv,
-            file_name="training_data.csv",
-            mime="text/csv"
-        )
-
-    except Exception as e:
-        st.error(f"❌ Error generating dataset: {e}")
 
 
 # Custom CSS
