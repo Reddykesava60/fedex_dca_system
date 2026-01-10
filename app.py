@@ -8,11 +8,27 @@ from src.logic import DCAAssigner, AnalyticsService
 import os
 import subprocess
 
-if not os.path.exists("training_data.csv"):
-    subprocess.run(["python", "generate_data.py"])
+st.header("Upload & Process Cases")
 
-if not os.path.exists("model.pkl"):
-    subprocess.run(["python", "src/ml_engine.py"])
+st.subheader("🔄 Auto Generate Sample Dataset")
+
+if st.button("Generate Synthetic Dataset"):
+    try:
+        subprocess.run(["python", "generate_data.py"], check=True)
+
+        if os.path.exists("training_data.csv"):
+            df = pd.read_csv("training_data.csv")
+            st.success("✅ Dataset generated successfully!")
+            st.dataframe(df.head(10))
+            st.session_state["uploaded_data"] = df
+        else:
+            st.error("❌ Dataset generation failed. File not found.")
+
+    except Exception as e:
+        st.error(f"Error generating dataset: {e}")
+
+
+
 
 
 
