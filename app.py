@@ -8,6 +8,9 @@ import os
 
 from generate_data import generate_synthetic_data
 
+# Page Config
+st.set_page_config(page_title="FedEx DCA System", page_icon="📦", layout="wide")
+
 
 st.subheader("🔄 Auto Generate Sample Dataset")
 
@@ -37,10 +40,6 @@ if st.button("Generate Synthetic Dataset"):
     except Exception as e:
         st.error(f"❌ Error generating dataset: {e}")
 
-
-
-# Page Config
-st.set_page_config(page_title="FedEx DCA System", page_icon="📦", layout="wide")
 
 # Custom CSS
 st.markdown("""
