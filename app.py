@@ -4,7 +4,17 @@ import plotly.express as px
 import plotly.graph_objects as go
 from src.ml_engine import MLEngine
 from src.logic import DCAAssigner, AnalyticsService
+
 import os
+import subprocess
+
+if not os.path.exists("training_data.csv"):
+    subprocess.run(["python", "generate_data.py"])
+
+if not os.path.exists("model.pkl"):
+    subprocess.run(["python", "src/ml_engine.py"])
+
+
 
 # Page Config
 st.set_page_config(page_title="FedEx DCA System", page_icon="📦", layout="wide")
