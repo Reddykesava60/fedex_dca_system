@@ -118,60 +118,34 @@ def render_dashboard():
 
 def render_upload():
     st.title("📂 Upload & Process Cases")
-
-    st.info("You can either upload your own CSV file or auto-generate a sample dataset.")
-
-    # ---------- UPLOAD CSV ----------
-    uploaded_file = st.file_uploader(
-        "Upload CSV file",
-        type=["csv"],
-        help="Upload a CSV file with debt case data"
-    )
-
-    if uploaded_file is not None:
+    
+    uploaded_file = st.file_uploader("Upload CSV file", type=['csv'])
+    
+    if uploaded_file:
         try:
             df = pd.read_csv(uploaded_file)
-            st.success(f"✅ Uploaded {len(df)} rows.")
-            st.dataframe(df.head())
-
-            if st.button("⚙️ Process with AI"):
+            st.success(f"Uploaded {len(df)} rows.")
+            
+            if st.button("Process with AI"):
                 with st.spinner("Analyzing cases..."):
+                    # 1. Predict
                     processed_df = st.session_state.ml_engine.predict_cases(df)
-                    processed_df['dca_assigned'] = processed_df.apply(
-                        DCAAssigner.assign_case, axis=1
-                    )
-
+                    
+                    # 2. Assign DCA
+                    processed_df['dca_assigned'] = processed_df.apply(DCAAssigner.assign_case, axis=1)
+                    
+                    # Save to session
                     st.session_state.cases_df = processed_df
-                    st.success("🎯 Analysis complete!")
+                    st.success("Analysis Complete! Cases assigned.")
+                    
+                    # Preview
                     st.dataframe(processed_df.head())
-
         except Exception as e:
-            st.error(f"❌ Error processing CSV: {e}")
-
-    st.divider()
-
-    # ---------- AUTO GENERATE ----------
-    st.subheader("🔄 Auto Generate Sample Dataset")
-
-    if st.button("Generate Synthetic Dataset"):
-        try:
-            df = generate_synthetic_data(1000)
-
-            st.session_state.cases_df = df
-            st.success("✅ Synthetic dataset generated!")
-            st.dataframe(df.head())
-
-            csv = df.to_csv(index=False).encode("utf-8")
-
-            st.download_button(
-                label="⬇️ Download Dataset (CSV)",
-                data=csv,
-                file_name="training_data.csv",
-                mime="text/csv"
-            )
-
-        except Exception as e:
-            st.error(f"❌ Error generating dataset: {e}")
+            st.error(f"Error processing file: {e}")
+            
+    # Template Download
+    st.markdown("---")
+    st.info("Don't have a file? Use the synthetic data generator (`generate_data.py`) to create `training_data.csv` and upload it here.")
 
 def render_insights():
     st.title("🤖 AI Insights & Recommendations")
