@@ -6,6 +6,26 @@ from src.ml_engine import MLEngine
 from src.logic import DCAAssigner, AnalyticsService
 import os
 
+from generate_data import generate_synthetic_data
+
+st.subheader("🔄 Auto Generate Sample Dataset")
+
+if st.button("Generate Synthetic Dataset"):
+    try:
+        df = generate_synthetic_data(1000)
+
+        # Save for reuse (optional)
+        df.to_csv("training_data.csv", index=False)
+
+        st.success("✅ Synthetic dataset generated successfully!")
+        st.dataframe(df.head(10))
+
+        # Store in session for dashboard & ML
+        st.session_state["uploaded_data"] = df
+
+    except Exception as e:
+        st.error(f"❌ Error generating dataset: {e}")
+
 
 
 # Page Config
